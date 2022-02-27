@@ -28,18 +28,20 @@ for i in `seq 1 "$attachmentNumber"`; do
   attachments[$j]=${subStringLeft%)*}
 done
 
-for i in `seq 1 "$attachmentNumber"`; do
-  let j=i-1
-  if [[ ! -e "$directoryRootName/$directoryName/${attachments[j]}" ]]; then
-    echo "The attachment file doesn't exist"
-    exit 1
-  fi
-  subStringLeft=${markdownAttachment[j]#*[}
-  attachmentCopy[$j]="[$i.${subStringLeft%]*}]($i.${attachments[j]})"
-  sed -i "${markdownAttachmentLineNumber[j]}c ${attachmentCopy[j]}" "$fileCopyName"
-  attachmentToAddToGit[$j]=$i.${attachments[j]}
-  cp "$directoryRootName/$directoryName/${attachments[j]}" "$directoryRootName/$directoryName/$i.${attachments[j]}"
-done
+if [[ ! -z "$markdownAttachmentResult" ]] ;then
+  for i in `seq 1 "$attachmentNumber"`; do
+    let j=i-1
+    if [[ ! -e "$directoryRootName/$directoryName/${attachments[j]}" ]]; then
+      echo "The attachment file doesn't exist"
+      exit 1
+    fi
+    subStringLeft=${markdownAttachment[j]#*[}
+    attachmentCopy[$j]="[$i.${subStringLeft%]*}]($i.${attachments[j]})"
+    sed -i "${markdownAttachmentLineNumber[j]}c ${attachmentCopy[j]}" "$fileCopyName"
+    attachmentToAddToGit[$j]=$i.${attachments[j]}
+    cp -r "$directoryRootName/$directoryName/${attachments[j]}" "$directoryRootName/$directoryName/$i.${attachments[j]}"
+  done
+fi
 
 outputFileName="$directoryRootName/$directoryName/0.$directoryName.docx"
 /bin/pandoc --reference-doc=./Template/custom-reference.docx "$fileCopyName" -o "$outputFileName"
@@ -48,8 +50,8 @@ cd "$directoryRootName/$directoryName"
 
 /bin/zip "$directoryName"ISE周报.zip "${attachmentToAddToGit[@]}" "0.$directoryName.docx"
 
-# git config user.name 'github-actions[bot]'
-# git config user.email 'github-actions[bot]@users.noreply.github.com'
-# git add "$directoryName"ISE周报.zip
-# git commit -m '[automated commit] Submit weekly'
-# git push
+git config user.name 'github-actions[bot]'
+git config user.email 'github-actions[bot]@users.noreply.github.com'
+git add "$directoryName"ISE周报.zip
+git commit -m '[automated commit] Submit weekly'
+git push
