@@ -4,7 +4,7 @@ MondayDate=`date "+%Y.%m.%d" --date "6 days ago"`
 FridayDate=`date "+%Y.%m.%d" --date "2 days ago"`
 
 directoryName="$MondayDate-$FridayDate"
-directoryRootName=`date "+%Y.%m"`
+directoryRootName=`date "+%Y.%m" --date "6 days ago"`
 fileName="$directoryRootName/$directoryName/template.md"
 fileCopyName="$directoryRootName/$directoryName/template_copy.md"
 
